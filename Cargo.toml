@@ -4,7 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ratatui = { version = "0.29.0", features = ["all-widgets"] }
+chrono = "0.4.40"
+crossterm = "0.29.0"
+
+[dependencies.ratatui]
+version = "0.29.0"
+features = ["all-widgets", "palette"]
 
 [dependencies.clap]
 version = "4.5.36"
