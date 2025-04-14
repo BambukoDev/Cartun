@@ -10,12 +10,19 @@ mod shared;
 #[derive(Parser)]
 struct Args {
     #[command(subcommand)]
-    command: Option<Command>
+    command: Option<Command>,
+    #[arg(long, short, help = "Print version info")]
+    version: bool
 }
 
 #[derive(Subcommand)]
 enum Command {
-    Hexclock
+    Hexclock {
+        #[arg(long, help = "Sets the background color of the clock")]
+        bg_color: Option<String>,
+        #[arg(long, help = "Toggle between simple and big ASCII clock")]
+        big: Option<bool>
+    },
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -24,7 +31,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             None => {
                 return (None, None);
             }
-            Some(Command::Hexclock) => {
+            Some(Command::Hexclock {bg_color, big}) => {
                 return (
                     Some(Box::new(
                         |frame: &mut ratatui::Frame| {
@@ -44,6 +51,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut render: Option<Box<dyn Fn(&mut ratatui::Frame)>>;
     let mut delay: Option<Duration>;
     (render, delay) = module(args.command);
+
+    if args.version {
+        print!("Cartun version {}\n", env!("CARGO_PKG_VERSION"));
+        ratatui::restore();
+        return Ok(());
+    }
 
     if render.is_none() { // TODO
         (render, delay) = module(None);
