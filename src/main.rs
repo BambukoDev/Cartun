@@ -11,7 +11,7 @@ mod shared;
 struct Args {
     #[command(subcommand)]
     command: Option<Command>,
-    #[arg(long, short, help = "Print version info")]
+    #[arg(long, short, action = clap::ArgAction::SetTrue , help = "Print version info")]
     version: bool
 }
 
@@ -34,10 +34,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             Some(Command::Hexclock {bg_color, big}) => {
                 return (
                     Some(Box::new(
-                        |frame: &mut ratatui::Frame| {
+                        move |frame: &mut ratatui::Frame| {
                             let now = Local::now();
                             hexclock::bg(frame, now);
-                            hexclock::clock_1(frame, now);
+                            if big.unwrap_or(false) {
+                                hexclock::clock_big(frame, now);
+                            } else {
+                                hexclock::clock_normal(frame, now);
+                            }
                         }
                     )),
                     Some(Duration::from_millis(50))
